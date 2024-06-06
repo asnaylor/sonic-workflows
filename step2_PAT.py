@@ -31,9 +31,9 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_10_6_4/RelValProdTTbar_13_pmx25ns/AODSIM/PUpmx25ns_106X_upgrade2018_realistic_v9-v1/10000/4440FA53-897B-9A4B-AD76-D1337B591A2F.root',
-        '/store/relval/CMSSW_10_6_4/RelValProdTTbar_13_pmx25ns/AODSIM/PUpmx25ns_106X_upgrade2018_realistic_v9-v1/10000/457C377A-809A-1947-A600-27720ED415FB.root',
-        '/store/relval/CMSSW_10_6_4/RelValProdTTbar_13_pmx25ns/AODSIM/PUpmx25ns_106X_upgrade2018_realistic_v9-v1/10000/655A4F07-F40C-324A-8EC0-B19A7F03893F.root'
+        '/pscratch/sd/a/asnaylor/cms/dataset/009E7EE3-3781-5048-A2F2-0E6139B13D46.root',
+        '/pscratch/sd/a/asnaylor/cms/dataset/015001B3-E5DC-154C-BE7C-CBEB4D2D5291.root',
+        '/pscratch/sd/a/asnaylor/cms/dataset/01918540-2DED-A54F-A3C4-C98845FB0C48.root'
     ),
     secondaryFileNames = cms.untracked.vstring()
 )
