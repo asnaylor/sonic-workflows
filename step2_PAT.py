@@ -31,9 +31,9 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/pscratch/sd/a/asnaylor/cms/dataset/009E7EE3-3781-5048-A2F2-0E6139B13D46.root',
-        '/pscratch/sd/a/asnaylor/cms/dataset/015001B3-E5DC-154C-BE7C-CBEB4D2D5291.root',
-        '/pscratch/sd/a/asnaylor/cms/dataset/01918540-2DED-A54F-A3C4-C98845FB0C48.root'
+        'file:/pscratch/sd/a/asnaylor/cms/dataset/009E7EE3-3781-5048-A2F2-0E6139B13D46.root',
+        'file:/pscratch/sd/a/asnaylor/cms/dataset/015001B3-E5DC-154C-BE7C-CBEB4D2D5291.root',
+        'file:/pscratch/sd/a/asnaylor/cms/dataset/01918540-2DED-A54F-A3C4-C98845FB0C48.root'
     ),
     secondaryFileNames = cms.untracked.vstring()
 )
