@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ACCESS=ssh
-CORES=8
+CORES=32
 BATCH=""
 CMSSWVER=CMSSW_14_1_0_pre0
 CMSSWVERS=(
@@ -90,6 +90,6 @@ cd ${CMSSWVER}/src
 eval `scramv1 runtime -sh`
 git cms-init $ACCESS_CMSSW $BATCH
 git cms-merge-topic -u fastmachinelearning:cmsTritonUpdates
-git clone ${ACCESS_GITHUB}fastmachinelearning/sonic-workflows -b CMSSW_14_1_X
+git clone ${ACCESS_GITHUB}asnaylor/sonic-workflows -b CMSSW_14_1_X
 cd ${CMSSW_BASE}/src
 scram b -j ${CORES}
