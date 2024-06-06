@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ACCESS=ssh
-CORES=8
+CORES=32
 BATCH=""
 CMSSWVER=CMSSW_12_0_0_pre5
 CMSSWVERS=(
@@ -68,5 +68,5 @@ git cms-addpkg HeterogeneousCore/SonicTriton
 git clone ${ACCESS_GITHUB}fastmachinelearning/sonic-models HeterogeneousCore/SonicTriton/data
 git cms-addpkg RecoBTag/Combined
 git clone ${ACCESS_GITHUB}fastmachinelearning/RecoBTag-Combined -b add_noragged RecoBTag/Combined/data
-git clone ${ACCESS_GITHUB}fastmachinelearning/sonic-workflows
+git clone ${ACCESS_GITHUB}asnaylor/sonic-workflows
 scram b -j ${CORES}
