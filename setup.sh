@@ -91,6 +91,6 @@ cd ${CMSSWVER}/src
 eval `scramv1 runtime -sh`
 git cms-init $ACCESS_CMSSW $BATCH
 git cms-merge-topic -u fastmachinelearning:cmsTritonUpdates2
-git clone ${ACCESS_GITHUB}fastmachinelearning/sonic-workflows -b CMSSW_14_1_X
+git clone ${ACCESS_GITHUB}asnaylor/sonic-workflows -b CMSSW_14_1_X
 cd ${CMSSW_BASE}/src
 scram b -j ${CORES}
