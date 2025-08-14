@@ -3,29 +3,24 @@
 This repository serves to deploy and run SONIC workflows for performance tests.
 
 ## Setup
+
+
+### Install
 ```bash
+mkdir -p $SCRATCH/cms/cmssw_14_1_X
+cd $SCRATCH/cms/cmssw_14_1_X
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-wget https://raw.githubusercontent.com/fastmachinelearning/sonic-workflows/CMSSW_14_1_X/setup.sh
+wget https://raw.githubusercontent.com/asnaylor/sonic-workflows/CMSSW_14_1_X/setup.sh
+wget https://raw.githubusercontent.com/asnaylor/sonic-workflows/CMSSW_14_1_X/env.sh
 chmod +x setup.sh
-./setup.sh
-voms-proxy-init --rfc --voms cms -valid 192:00
-cd CMSSW_14_1_0_pre7/src/sonic-workflows
-cmsenv
+chmod +x env.sh
+./setup.sh -j 16
 ```
 
-Notes:
-* Input AODSIM files currently hosted at Purdue
-
-## Purdue resources
-
-Interactive CPU job:
-```
-sinteractive --account=cms --partition=hammer-g -N 1 -n1 -c4 --mem-per-cpu=2G
-```
-
-Interactive GPU job:
-```
-sinteractive --account=cms --partition=hammer-f --gres=gpu:1 -N 1 -n1 -c4 --mem-per-cpu=2G
+### Each time
+```bash
+cd $SCRATCH/cms/cmssw_14_1_X
+./env.sh
 ```
 
 ## Running
@@ -39,24 +34,6 @@ To run a workflow with the default settings:
 ```bash
 cmsRun run.py --maxEvents 100
 ```
-
-## Driver commands
-
-2017 ultra-legacy re-miniAOD:
-```bash
-runTheMatrix.py -l 1325.517 --dryRun --command="--no_exec"
-```
-
-Modified commands:
-```
-dasgoclient --limit 0 --query 'file dataset=/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL17RECO-106X_mc2017_realistic_v6-v2/AODSIM site=T2_IT_Pisa' | sort -u > step1_dasquery.log
-cat step1_dasquery.log | head -n 3 > step1_dasquery_truncated.log
-cmsDriver.py step2  -s PAT --era Run2_2017 -n 100 --process PAT --conditions auto:phase1_2017_realistic --mc  --scenario pp --eventcontent MINIAODSIM --datatier MINIAODSIM --procModifiers run2_miniAOD_UL_preSummer20 --no_exec --filein filelist:step1_dasquery_truncated.log --fileout file:step2.root
-```
-
-UL re-miniAOD workflows for other years: 1325.516, 1325.5161, 1325.518
-
-Run3/Phase2 SONIC-enabled workflows are available from `runTheMatrix.py -w upgrade -n` with suffix `.9001`
 
 ## Listing models
 
