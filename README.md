@@ -9,12 +9,15 @@ This repository serves to deploy and run SONIC workflows for performance tests.
 ```bash
 mkdir -p $SCRATCH/cms/cmssw_14_1_X
 cd $SCRATCH/cms/cmssw_14_1_X
-source /cvmfs/cms.cern.ch/cmsset_default.sh
 wget https://raw.githubusercontent.com/asnaylor/sonic-workflows/CMSSW_14_1_X/setup.sh
 wget https://raw.githubusercontent.com/asnaylor/sonic-workflows/CMSSW_14_1_X/env.sh
 chmod +x setup.sh
 chmod +x env.sh
-./setup.sh -j 16
+SHIFTER_IMAGE="cmssw/el7:x86_64"
+shifter --image=${SHIFTER_IMAGE} --module=cvmfs \
+	/bin/bash -c "
+		  source /cvmfs/cms.cern.ch/cmsset_default.sh && \
+		  ./setup.sh -j 16 "
 ```
 
 ### Each time
