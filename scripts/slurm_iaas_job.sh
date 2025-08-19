@@ -30,9 +30,9 @@ MAIN_DIR=${SCRATCH}/cms/cmssw_14_1_X
 LOG_DIR=${MAIN_DIR}/logs/${SLURM_JOBID}
 MODEL_DIR=$SCRATCH/cms/sonic/triton_models/CMSSW_14_1_0_pre7_LATEST
 
-N_GPU_NODES=${SLURM_NNODES_HET_GROUP_0}
-N_LB_NODES=${SLURM_NNODES_HET_GROUP_1}
-N_CPU_NODES=${SLURM_NNODES_HET_GROUP_2}
+N_GPU_NODES=${SLURM_JOB_NUM_NODES_HET_GROUP_0}
+N_LB_NODES=${SLURM_JOB_NUM_NODES_HET_GROUP_1}
+N_CPU_NODES=${SLURM_JOB_NUM_NODES_HET_GROUP_2}
 N_THREADS_PER_CLIENT=${1:-4}
 
 TRITON_SHIFTER_IMAGE="fastml/triton-torchgeo:22.07-py3-geometric"
@@ -63,7 +63,7 @@ srun \
     --het-group=0 \
     --ntasks-per-node=4 \
     --gpus-per-task=1 --gpu-bind=closest --cpus-per-task=16 --threads-per-core=1 \
-    --label --output=${LOG_DIR}/triton/triton_GPU_server_%N_%t.out \
+    --output=${LOG_DIR}/triton/triton_GPU_server_%N_%t.out \
         ./start_triton_server.sh ${TRITON_SHIFTER_IMAGE} ${MODEL_DIR} &
 GPU_NODELIST=$(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_0})
 
@@ -94,11 +94,12 @@ done
 
 # Launch Load Balancers
 echo "<> Starting $((4*N_LB_NODES)) LBs"
+mkdir ${LOG_DIR}/envoy
 srun \
     --het-group=1 \
     --ntasks-per-node=4 \
     --gpus-per-task=1 --gpu-bind=closest --cpus-per-task=16 --threads-per-core=1 \
-    --label --output=${LOG_DIR}/envoy/envoy_server_%N_%t.out \
+    --output=${LOG_DIR}/envoy/envoy_server_%N_%t.out \
         ./start_envoy_proxy.sh ${LB_SHIFTER_IMAGE} ${N_LB_NODES} ${TRITON_SERVERS} &
 
 LB_NODELIST=$(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_1})
@@ -124,7 +125,7 @@ srun \
     --ntasks-per-node=1 \
         shifter \
         --image=nvcr.io/nvidia/tritonserver:22.02-py3-sdk --module=none \
-                perf_analyzer_test.sh ${LB_PORT} ${LB_SERVERS}
+                ./perf_analyzer_test.sh ${LB_PORT} ${LB_SERVERS}
 
 
 #N_THREADS_PER_CLIENT

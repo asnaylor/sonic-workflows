@@ -18,9 +18,9 @@ HSN_ID=${SLURM_LOCALID}
 LB_ID=${SLURM_PROCID}
 ENVOY_PORT=9000
 ADMIN_PORT=9901
-ENVOY_HOSTNAME=$(dig +short ${hostname}-hsn${HSN_ID})
+ENVOY_HOSTNAME=$(dig +short ${HOSTNAME}-hsn${HSN_ID})
 
-echo "<> Starting Envoy LB on ${hostname} HSN interface ${HSN_ID}"
+echo "<> Starting Envoy LB on ${HOSTNAME} HSN interface ${HSN_ID}"
 echo "<> Envoy port: ${ENVOY_PORT}, Admin port: ${ADMIN_PORT}"
 
 # Create temp file

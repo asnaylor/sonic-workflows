@@ -11,4 +11,4 @@ shifter --module=gpu --image=${TRITON_SHIFTER_IMAGE} \
         --grpc-address ${HOSTNAME}-hsn${SLURM_LOCALID} \
         --grpc-port 8001 \
         --http-port $((8000 + $SLURM_LOCALID*10)) \
-        --metrics-port $((8002 + $SLURM_LOCALID*10))'
+        --metrics-port $((8002 + $SLURM_LOCALID*10))
