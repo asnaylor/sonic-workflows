@@ -22,7 +22,6 @@
 # Usage
 # ./slurm_iaas_job.sh <threads_per_client>
 
-set -euo pipefail
 
 # Variables
 SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
@@ -40,6 +39,7 @@ LB_SHIFTER_IMAGE="envoyproxy/envoy:v1.34.0"
 CLIENT_SHIFTER_IMAGE=${SLURM_SPANK_SHIFTER_IMAGEREQUEST}
 
 # Save metadata
+mkdir -p ${LOG_DIR}
 METADATA_FILE=${LOG_DIR}/config.txt
 cp ${SCRIPT_PATH} ${LOG_DIR}/.
 meta_vars=(
@@ -65,16 +65,16 @@ srun \
     --gpus-per-task=1 --gpu-bind=closest --cpus-per-task=16 --threads-per-core=1 \
     --output=${LOG_DIR}/triton/triton_GPU_server_%N_%t.out \
         ./start_triton_server.sh ${TRITON_SHIFTER_IMAGE} ${MODEL_DIR} &
-GPU_NODELIST=$(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_0})
+GPU_NODELIST=($(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_0}))
 
 # Triton Health Check
 ports=(8000 8010 8020 8030)
 
 # Convert to array
 GPU_SERVERS=()
-for host in ${GPU_NODELIST}; do
+for node in "${GPU_NODELIST[@]}"; do
     for port in "${ports[@]}"; do
-        GPU_SERVERS+=("${host}:${port}")
+        GPU_SERVERS+=("${node}:${port}")
     done
 done
 
@@ -86,9 +86,9 @@ gpu_nics=("hsn0" "hsn1" "hsn2" "hsn3")
 
 # Convert to array
 TRITON_SERVERS=()
-for host in ${GPU_NODELIST}; do
+for node in "${GPU_NODELIST[@]}"; do
     for nic in "${gpu_nics[@]}"; do
-        TRITON_SERVERS+=("$(dig +short ${host}-${nic})")
+        TRITON_SERVERS+=("$(dig +short ${node}-${nic})")
     done
 done
 
@@ -100,16 +100,16 @@ srun \
     --ntasks-per-node=4 \
     --gpus-per-task=1 --gpu-bind=closest --cpus-per-task=16 --threads-per-core=1 \
     --output=${LOG_DIR}/envoy/envoy_server_%N_%t.out \
-        ./start_envoy_proxy.sh ${LB_SHIFTER_IMAGE} ${N_LB_NODES} ${TRITON_SERVERS} &
+        ./start_envoy_proxy.sh ${LB_SHIFTER_IMAGE} ${N_LB_NODES} "${TRITON_SERVERS[@]}" &
 
-LB_NODELIST=$(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_1})
+LB_NODELIST=($(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_1}))
 
 # Convert to array
 LB_SERVERS=()
 LB_PORT=9000
-for host in ${LB_NODELIST}; do
+for node in "${LB_NODELIST[@]}"; do
     for nic in "${gpu_nics[@]}"; do
-        LB_SERVERS+=("$(dig +short ${host}-${nic})")
+        LB_SERVERS+=("$(dig +short ${node}-${nic})")
     done
 done
 
@@ -125,7 +125,7 @@ srun \
     --ntasks-per-node=1 \
         shifter \
         --image=nvcr.io/nvidia/tritonserver:22.02-py3-sdk --module=none \
-                ./perf_analyzer_test.sh ${LB_PORT} ${LB_SERVERS}
+                ./perf_analyzer_test.sh ${LB_PORT} "${LB_SERVERS[@]}"
 
 
 #N_THREADS_PER_CLIENT

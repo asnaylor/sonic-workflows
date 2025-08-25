@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 # Usage: ./envoy_proxy_lb.sh <shifter_image> <number_of_lb_nodes> <triton_servers>
+
 
 LB_SHIFTER_IMAGE=${1}
 N_LB_NODES=${2}
@@ -55,7 +54,8 @@ echo "Added $COUNTER Triton endpoints across assigned nodes"
 # Run Envoy in Shifter container
 shifter --module=none \
     --image=$LB_SHIFTER_IMAGE \
-        envoy -c ${TMPFILE} --concurrency 16
+        envoy -c ${TMPFILE} --concurrency 16 \
+              --disable-hot-restart
 
 # Cleanup on exit
 trap "rm -f ${TMPFILE}" EXIT
