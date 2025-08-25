@@ -107,14 +107,15 @@ LB_NODELIST=($(scontrol show hostnames ${SLURM_JOB_NODELIST_HET_GROUP_1}))
 # Convert to array
 LB_SERVERS=()
 LB_PORT=9000
+LB_ADMIN_PORT=9901
 for node in "${LB_NODELIST[@]}"; do
     for nic in "${gpu_nics[@]}"; do
         LB_SERVERS+=("$(dig +short ${node}-${nic})")
     done
 done
 
-#wait for lb
-sleep 60
+#Wait for envoy servers to start
+./wait_for_envoy_upstreams.sh ${LB_ADMIN_PORT} "${LB_SERVERS[@]}"
 
 # Launch Test with perf_analyzer
 echo "<> Perf analyzer test"
