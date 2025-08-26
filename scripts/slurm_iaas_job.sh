@@ -88,7 +88,7 @@ gpu_nics=("hsn0" "hsn1" "hsn2" "hsn3")
 TRITON_SERVERS=()
 for node in "${GPU_NODELIST[@]}"; do
     for nic in "${gpu_nics[@]}"; do
-        TRITON_SERVERS+=("$(dig +short ${node}-${nic})")
+        TRITON_SERVERS+=("$(getent hosts ${node}-${nic} | awk '{print $1}')")
     done
 done
 
@@ -110,7 +110,7 @@ LB_PORT=9000
 LB_ADMIN_PORT=9901
 for node in "${LB_NODELIST[@]}"; do
     for nic in "${gpu_nics[@]}"; do
-        LB_SERVERS+=("$(dig +short ${node}-${nic})")
+        LB_SERVERS+=("$(getent hosts ${node}-${nic} | awk '{print $1}')")
     done
 done
 

@@ -17,7 +17,7 @@ HSN_ID=${SLURM_LOCALID}
 LB_ID=${SLURM_PROCID}
 ENVOY_PORT=9000
 ADMIN_PORT=9901
-ENVOY_HOSTNAME=$(dig +short ${HOSTNAME}-hsn${HSN_ID})
+ENVOY_HOSTNAME=$(getent hosts ${HOSTNAME}-hsn${HSN_ID} | awk '{print $1}')
 
 echo "<> Starting Envoy LB on ${HOSTNAME} HSN interface ${HSN_ID}"
 echo "<> Envoy port: ${ENVOY_PORT}, Admin port: ${ADMIN_PORT}"
