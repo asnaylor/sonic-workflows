@@ -118,15 +118,82 @@ done
 ./wait_for_envoy_upstreams.sh ${LB_ADMIN_PORT} "${LB_SERVERS[@]}"
 
 # Launch Test with perf_analyzer
-echo "<> Perf analyzer test"
+echo "<> Perf analyzer test..."
+mkdir ${LOG_DIR}/perf_analyzer
 srun \
     --label \
     --het-group=2 \
     --time=00:20:00 \
     --ntasks-per-node=1 \
+    --output=${LOG_DIR}/perf_analyzer/perf_analyzer_%N_%t.out \
         shifter \
         --image=nvcr.io/nvidia/tritonserver:22.02-py3-sdk --module=none \
                 ./perf_analyzer_test.sh ${LB_PORT} "${LB_SERVERS[@]}"
 
+#Starting SONIC test
+echo "<> Starting SONIC tests..."
 
-#N_THREADS_PER_CLIENT
+#Copy files to tmp
+echo "[] Copy files to tmp"
+srun \
+    --label \
+    --het-group=2 \
+    --ntasks-per-node=1 \
+        shifter \
+            bash -c 'rm -rf /tmp/${USER}/*; mkdir -p /tmp/${USER}/dataset && \
+                cp ${SCRATCH}/cms/dataset/{009E7EE3-3781-5048-A2F2-0E6139B13D46,015001B3-E5DC-154C-BE7C-CBEB4D2D5291,01918540-2DED-A54F-A3C4-C98845FB0C48}.root \
+                /tmp/${USER}/dataset/.'
+
+#Cache Run
+N_TASKS=$((128 / ${N_THREADS_PER_CLIENT}))
+echo "[] Start first cache run..."
+mkdir ${LOG_DIR}/cache_run_1
+srun \
+    --label \
+    --het-group=2 \
+    --time=00:20:00 \
+    --cpus-per-task=${N_THREADS_PER_CLIENT} \
+    --threads-per-core=1 \
+    --ntasks-per-node=1 \
+    --output=${LOG_DIR}/cache_run_1/%N_%t/sonic_client_%N_%t.out \
+        shifter \
+            shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} 100 ${LB_PORT} "${LB_SERVERS[@]}"
+
+#Cache Run
+echo "[] Start second cache run..."
+mkdir ${LOG_DIR}/cache_run_2
+srun \
+    --label \
+    --het-group=2 \
+    --time=00:20:00 \
+    --cpus-per-task=${N_THREADS_PER_CLIENT} \
+    --threads-per-core=1 \
+    --ntasks-per-node=1 \
+    --output=${LOG_DIR}/cache_run_2/%N_%t/sonic_client_%N_%t.out \
+        shifter \
+                shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} 100 ${LB_PORT} "${LB_SERVERS[@]}"
+
+
+#Final Run
+# echo "[] Begin final run..."
+# mkdir ${LOG_DIR}/cmsRun
+# srun \
+#     --time=04:00:00 \
+#     --het-group=2 \
+#     --cpus-per-task=${N_THREADS_PER_CLIENT} \
+#     --threads-per-core=1 \
+#     --ntasks-per-node=${N_TASKS} \
+#     --output=${LOG_DIR}/cmsRun/%N_%t/sonic_client_%N_%t.out \
+#         shifter \
+#                 shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} -1 ${LB_PORT} "${LB_SERVERS[@]}"
+
+#Clean up tmp
+echo "[] Clean up tmp"
+srun \
+    --label \
+    --het-group=2 \
+    --ntasks-per-node=1 \
+        shifter \
+            bash -c 'rm -rf /tmp/${USER}/*'
+
+echo "<> Complete"

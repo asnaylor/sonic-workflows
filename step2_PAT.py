@@ -8,6 +8,9 @@ import FWCore.ParameterSet.Config as cms
 from Configuration.Eras.Era_Run2_2017_cff import Run2_2017
 from Configuration.ProcessModifiers.run2_miniAOD_UL_preSummer20_cff import run2_miniAOD_UL_preSummer20
 
+import uuid
+import os
+
 process = cms.Process('PAT',Run2_2017,run2_miniAOD_UL_preSummer20)
 
 # import of standard configurations
@@ -31,9 +34,9 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        'root://eos.cms.rcac.purdue.edu//store/mc/RunIISummer20UL17RECO/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/AODSIM/106X_mc2017_realistic_v6-v2/230000/009E7EE3-3781-5048-A2F2-0E6139B13D46.root',
-        'root://eos.cms.rcac.purdue.edu//store/mc/RunIISummer20UL17RECO/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/AODSIM/106X_mc2017_realistic_v6-v2/230000/015001B3-E5DC-154C-BE7C-CBEB4D2D5291.root',
-        'root://eos.cms.rcac.purdue.edu//store/mc/RunIISummer20UL17RECO/TTJets_TuneCP5_13TeV-amcatnloFXFX-pythia8/AODSIM/106X_mc2017_realistic_v6-v2/230000/01918540-2DED-A54F-A3C4-C98845FB0C48.root'
+        'file:/tmp/asnaylor/dataset/009E7EE3-3781-5048-A2F2-0E6139B13D46.root',
+        'file:/tmp/asnaylor/dataset/015001B3-E5DC-154C-BE7C-CBEB4D2D5291.root',
+        'file:/tmp/asnaylor/dataset/01918540-2DED-A54F-A3C4-C98845FB0C48.root'
     ),
     secondaryFileNames = cms.untracked.vstring()
 )
@@ -78,6 +81,8 @@ process.configurationMetadata = cms.untracked.PSet(
 )
 
 # Output definition
+username = 'asnaylor' #os.getlogin doesn't work with this version of python
+random_string = str(uuid.uuid4())[:6]
 
 process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     compressionAlgorithm = cms.untracked.string('LZMA'),
@@ -89,7 +94,8 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:step2.root'),
+    # fileName = cms.untracked.string('file:step2.root'),
+    fileName = cms.untracked.string('file:/tmp/%s/%s_step2.root' % (username, random_string)),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(

@@ -6,7 +6,7 @@ LB_ADDRESS="${@:2}"
 LB_SERVERS_ARRAY=($LB_ADDRESS)
 LB_INDEX=$(( SLURM_PROCID % ${#LB_SERVERS_ARRAY[@]} ))
 ADDRESS=${LB_SERVERS_ARRAY[$LB_INDEX]}:${LB_PORT}
-echo "<> $ADDRESS" #remove
+echo "<> Connecting to $ADDRESS" #remove
 
 # Run enhanced baseline test with metrics collection
 Second_dimension=100

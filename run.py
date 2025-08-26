@@ -77,12 +77,13 @@ if len(options.redir)>0:
     process.source.fileNames = [(options.redir if val.startswith("/") else "")+val for val in process.source.fileNames]
 
 if hasattr(process,'TritonService'):
-    process.TritonService.verbose = options.verbose or options.verboseService or options.verboseDiscovery
-    process.TritonService.fallback.verbose = options.verbose or options.verboseServer
-    process.TritonService.fallback.container = options.container
-    process.TritonService.fallback.imageName = options.imageName
-    process.TritonService.fallback.tempDir = options.tempDir
-    process.TritonService.fallback.device = options.device
+    # process.TritonService.verbose = options.verbose or options.verboseService or options.verboseDiscovery
+    # process.TritonService.fallback.verbose = options.verbose or options.verboseServer
+    # process.TritonService.fallback.container = options.container
+    # process.TritonService.fallback.imageName = options.imageName
+    # process.TritonService.fallback.tempDir = options.tempDir
+    # process.TritonService.fallback.device = options.device
+    process.TritonService.fallback.enable = False
     if len(options.address)>0:
         process.TritonService.servers.append(
             cms.PSet(
@@ -107,6 +108,7 @@ if options.verbose or options.verboseService:
 # propagate changes to all SONIC producers
 for pname,producer in process._Process__producers.items():
     if hasattr(producer,'Client'):
+        producer.Client.allowedTries = cms.untracked.uint32(10)
         producer.Client.verbose = cms.untracked.bool(options.verbose or options.verboseClient)
         if producer.Client.verbose:
             keepMsgs.extend([pname,pname+":TritonClient"])
@@ -127,5 +129,14 @@ for msg in keepMsgs:
     )
 
 if options.tmi:
-    from Validation.Performance.TimeMemorySummary import customise
-    process = customise(process)
+    # from Validation.Performance.TimeMemorySummary import customise
+    # process = customise(process)
+    process.Timing=cms.Service("Timing")
+
+    #Add these 3 lines to put back the summary for timing information at the end of the logfile
+    if hasattr(process,'options'):
+        process.options.wantSummary = cms.untracked.bool(True)
+    else:
+        process.options = cms.untracked.PSet(
+            wantSummary = cms.untracked.bool(True)
+        )
