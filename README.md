@@ -38,6 +38,11 @@ To run a workflow with the default settings:
 cmsRun run.py --maxEvents 100
 ```
 
+Slurm:
+```bash
+sbatch -A m2612 -N 2 -C 'gpu' : -A m2612 -N 2 -C 'gpu' : -A nstaff -N 2 -C 'cpu' slurm_iaas_job.sh 4
+```
+
 ## Listing models
 
 The following script provides a list of all models possibly used by a config:
