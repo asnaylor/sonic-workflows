@@ -121,7 +121,6 @@ done
 echo "<> Perf analyzer test..."
 mkdir ${LOG_DIR}/perf_analyzer
 srun \
-    --label \
     --het-group=2 \
     --time=00:20:00 \
     --ntasks-per-node=1 \
@@ -149,43 +148,41 @@ N_TASKS=$((128 / ${N_THREADS_PER_CLIENT}))
 echo "[] Start first cache run..."
 mkdir ${LOG_DIR}/cache_run_1
 srun \
-    --label \
     --het-group=2 \
     --time=00:20:00 \
     --cpus-per-task=${N_THREADS_PER_CLIENT} \
     --threads-per-core=1 \
     --ntasks-per-node=1 \
-    --output=${LOG_DIR}/cache_run_1/%N_%t/sonic_client_%N_%t.out \
+    --output=${LOG_DIR}/cache_run_1/sonic_client_%N_%t.out \
         shifter \
-            shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} 100 ${LB_PORT} "${LB_SERVERS[@]}"
+            ./shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} 100 ${LB_PORT} "${LB_SERVERS[@]}"
 
 #Cache Run
 echo "[] Start second cache run..."
 mkdir ${LOG_DIR}/cache_run_2
 srun \
-    --label \
     --het-group=2 \
     --time=00:20:00 \
     --cpus-per-task=${N_THREADS_PER_CLIENT} \
     --threads-per-core=1 \
     --ntasks-per-node=1 \
-    --output=${LOG_DIR}/cache_run_2/%N_%t/sonic_client_%N_%t.out \
+    --output=${LOG_DIR}/cache_run_2/sonic_client_%N_%t.out \
         shifter \
-                shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} 100 ${LB_PORT} "${LB_SERVERS[@]}"
+                ./shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} 100 ${LB_PORT} "${LB_SERVERS[@]}"
 
 
 #Final Run
-# echo "[] Begin final run..."
-# mkdir ${LOG_DIR}/cmsRun
-# srun \
-#     --time=04:00:00 \
-#     --het-group=2 \
-#     --cpus-per-task=${N_THREADS_PER_CLIENT} \
-#     --threads-per-core=1 \
-#     --ntasks-per-node=${N_TASKS} \
-#     --output=${LOG_DIR}/cmsRun/%N_%t/sonic_client_%N_%t.out \
-#         shifter \
-#                 shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} -1 ${LB_PORT} "${LB_SERVERS[@]}"
+echo "[] Begin final run..."
+mkdir ${LOG_DIR}/cmsRun
+srun \
+    --time=07:00:00 \
+    --het-group=2 \
+    --cpus-per-task=${N_THREADS_PER_CLIENT} \
+    --threads-per-core=1 \
+    --ntasks-per-node=${N_TASKS} \
+    --output=${LOG_DIR}/%N_%t/sonic_client_%N_%t.out \
+        shifter \
+                ./shifter_cmsRun.sh ${N_THREADS_PER_CLIENT} -1 ${LB_PORT} "${LB_SERVERS[@]}"
 
 #Clean up tmp
 echo "[] Clean up tmp"

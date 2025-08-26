@@ -29,7 +29,7 @@ SONIC_ADDRESS=${LB_SERVERS_ARRAY[$LB_INDEX]}
 
 #Initalise
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-cd CMSSW_14_1_0_pre7/src/
+cd ../../
 cmsenv
 cd sonic-workflows
 
@@ -48,6 +48,5 @@ time cmsRun run.py \
 CMSRUN_PID=$!
 wait $CMSRUN_PID
 
-# grep -A 20 "TimeReport> Time report complete" ${TMP_OUT}
-cat ${TMP_OUT}
+grep -A 20 "TimeReport> Time report complete" ${TMP_OUT}
 rm ${TMP_OUT}
