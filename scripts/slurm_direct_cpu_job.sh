@@ -6,12 +6,6 @@
 #SBATCH --image=cmssw/el7:x86_64
 #SBATCH --module=cvmfs
 
-#SBATCH --constraint='gpu&hbm40g'
-#SBATCH --nodes=1
-#SBATCH hetjob
-#SBATCH --constraint='gpu&hbm40g'
-#SBATCH --nodes=1
-#SBATCH hetjob
 #SBATCH --constraint='cpu'
 #SBATCH --nodes=1
 
